@@ -7,7 +7,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
 public class Producer {
-	private static final String CONFIG = "/context.xml";
+	private static final String CONFIG = "/producer_context.xml";
 	private static Random rand = new Random();
 
 	public static void main(String[] args) {
