@@ -9,39 +9,42 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
+	<!-- 生产者通过这个频道传送消息  基于queue-->
     <int:channel id="inputToKafka">
         <int:queue/>
     </int:channel>
 
-    <int-kafka:outbound-channel-adapter id="kafkaOutboundChannelAdapter"
-                                        kafka-producer-context-ref="kafkaProducerContext"
-                                        auto-startup="false"
-                                        channel="inputToKafka"
-                                        order="3"
-            >
+	<!-- 生产者发送消息设置  频道+方法配置 -->
+    <int-kafka:outbound-channel-adapter id="kafkaOutboundChannelAdapter" kafka-producer-context-ref="kafkaProducerContext" 
+    			auto-startup="true" channel="inputToKafka" order="3">
         <int:poller fixed-delay="1000" time-unit="MILLISECONDS" receive-timeout="0" task-executor="taskExecutor"/>
     </int-kafka:outbound-channel-adapter>
 
     <task:executor id="taskExecutor" pool-size="5" keep-alive="120" queue-capacity="500"/>
 
-	<bean id="producerProperties"
-		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	<!-- 生产者发送消息设置  频道+方法配置 -->
+	<bean id="producerProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="topic.metadata.refresh.interval.ms">3600000</prop>
+				<!-- 生产者定时更新topic元信息的时间间隔 ，若是设置为0，那么会在每个消息发送后都去更新数据 -->
+				<prop key="topic.metadata.refresh.interval.ms">0</prop>
+				<!-- 消息发送失败后的重试次数 -->
 				<prop key="message.send.max.retries">5</prop>
 				<prop key="serializer.class">kafka.serializer.StringEncoder</prop>
+				<!-- #消息的确认模式
+						# 0：不保证消息的到达确认，只管发送，低延迟但是会出现消息的丢失，在某个server失败的情况下，有点像TCP
+						# 1：发送消息，并会等待leader 收到确认后，一定的可靠性
+						# -1：发送消息，等待leader收到确认，并进行复制操作后，才返回，最高的可靠性 -->
 				<prop key="request.required.acks">1</prop>
 			</props>
 		</property>
 	</bean>
 
-	<int-kafka:producer-context id="kafkaProducerContext"
-		producer-properties="producerProperties">
+	<!-- 消息发送的主题设置。必须设置了主题才能发送相应主题消息 -->
+	<int-kafka:producer-context id="kafkaProducerContext" producer-properties="producerProperties">
 		<int-kafka:producer-configurations>
-			<int-kafka:producer-configuration broker-list="localhost:9092"
-                       topic="test"
-                       compression-codec="default"/>
+			<int-kafka:producer-configuration broker-list="localhost:9092" topic="test" compression-codec="default"/>
 		</int-kafka:producer-configurations>
 	</int-kafka:producer-context>
+	
 </beans>

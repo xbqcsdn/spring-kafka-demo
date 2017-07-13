@@ -16,8 +16,8 @@ public class Producer {
 
 		final MessageChannel channel = ctx.getBean("inputToKafka", MessageChannel.class);
 
-		for (int i = 0; i < 100; i++) {
-			channel.send(MessageBuilder.withPayload("Message-" + rand.nextInt()).setHeader("messageKey", String.valueOf(i)).setHeader("topic", "test").build());
+		for (int i = 0; i < 10; i++) {
+			channel.send(MessageBuilder.withPayload("xsjt" + "中国人66666-" + rand.nextInt()).setHeader("messageKey", String.valueOf(i)).setHeader("topic", "test").build());
 		}
 
 		try {

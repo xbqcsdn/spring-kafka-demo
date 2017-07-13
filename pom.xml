@@ -13,13 +13,15 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.1.2.RELEASE</spring.version>
-		<spring-integration.version>4.0.3.RELEASE</spring-integration.version>
-		<spring-integration-stream.version>4.1.0.RELEASE</spring-integration-stream.version>
+<!-- 		<spring-integration.version>4.0.3.RELEASE</spring-integration.version> -->
+<!-- 		<spring-integration-stream.version>4.1.0.RELEASE</spring-integration-stream.version> -->
+
 		<spring-integration-kafka.version>1.0.0.M2</spring-integration-kafka.version>
-		<kafka.version>0.8.1.1</kafka.version>
+		
+<!-- 		<kafka.version>0.8.1.1</kafka.version> -->
 		<log4j.version>1.2.15</log4j.version>
-		<logback.version>[1.1.2,)</logback.version>
-		<slf4j.version>[1.7.7,)</slf4j.version>
+		<logback.version>1.2.1</logback.version>
+		<slf4j.version>1.7.20</slf4j.version>
 	</properties>
 
 	<repositories>
@@ -47,18 +49,30 @@
 	<dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-access</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
+		
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+		    <version>${slf4j.version}</version>
 		</dependency>
 
 		<dependency>
@@ -75,35 +89,8 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.google.code.sortpom</groupId>
-				<artifactId>maven-sortpom-plugin</artifactId>
-				<version>2.3.0</version>
-			</plugin>
-			<plugin>  
-                <groupId>org.apache.maven.plugins</groupId>  
-                <artifactId>maven-dependency-plugin</artifactId>  
-                <executions>  
-                    <execution>  
-                        <id>copy</id>  
-                        <phase>package</phase>  
-                        <goals>  
-                            <goal>copy-dependencies</goal>  
-                        </goals>  
-                        <configuration>  
-                            <outputDirectory>  
-                                ${project.build.directory}/lib  
-                            </outputDirectory>  
-                        </configuration>  
-                    </execution>  
-                </executions>  
-            </plugin>
-		</plugins>
-	</build>
 </project>

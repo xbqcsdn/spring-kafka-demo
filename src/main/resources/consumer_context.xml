@@ -12,6 +12,7 @@
         <int:queue/>
     </int:channel>
     
+    <!-- channel配置 -->
 	<int-kafka:inbound-channel-adapter
 		id="kafkaInboundChannelAdapter" kafka-consumer-context-ref="consumerContext"
 		auto-startup="false" channel="inputFromKafka">
@@ -19,32 +20,41 @@
 			max-messages-per-poll="5" />
 	</int-kafka:inbound-channel-adapter>
 
+	<!-- 消费者配置 -->
 	<bean id="consumerProperties"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
+				<!-- 
+					# 当zookeeper中没有初始的offset时，或者超出offset上限时的处理方式 。
+					# smallest ：重置为最小值 
+					# largest:重置为最大值 
+					# anything else：抛出异常给consumer
+				 -->
 				<prop key="auto.offset.reset">smallest</prop>
+				<!-- socket的接收缓冲区 (SO_RCVBUF) -->
 				<prop key="socket.receive.buffer.bytes">10485760</prop> <!-- 10M -->
+				<!-- 从每个分区fetch的消息大小限制 -->
 				<prop key="fetch.message.max.bytes">5242880</prop>
+				<!--  自动提交的时间间隔 -->
 				<prop key="auto.commit.interval.ms">1000</prop>
 			</props>
 		</property>
 	</bean>
+	
+	<bean id="kafkaDecoder" class="org.springframework.integration.kafka.serializer.common.StringDecoder" />
 
 	<int-kafka:consumer-context id="consumerContext"
 		consumer-timeout="4000" zookeeper-connect="zookeeperConnect" consumer-properties="consumerProperties">
 		<int-kafka:consumer-configurations>
-			<int-kafka:consumer-configuration
-				group-id="mygroup" max-messages="5000">
+			<int-kafka:consumer-configuration group-id="mygroup" max-messages="5000" value-decoder="kafkaDecoder" key-decoder="kafkaDecoder">
+				<!-- 可以写多个topic -->
 				<int-kafka:topic id="test" streams="4" />
 			</int-kafka:consumer-configuration>
-			<!-- <int-kafka:consumer-configuration group-id="default3" value-decoder="kafkaSpecificDecoder" 
-				key-decoder="kafkaReflectionDecoder" max-messages="10"> <int-kafka:topic-filter 
-				pattern="regextopic.*" streams="4" exclude="false" /> </int-kafka:consumer-configuration> -->
 		</int-kafka:consumer-configurations>
 	</int-kafka:consumer-context>
 
-	<int-kafka:zookeeper-connect id="zookeeperConnect"
-		zk-connect="localhost:2181" zk-connection-timeout="6000"
+	<!-- zookeeper配置 可以配置多个，以逗号隔开 -->
+	<int-kafka:zookeeper-connect id="zookeeperConnect" zk-connect="localhost:2181" zk-connection-timeout="6000" 
 		zk-session-timeout="400" zk-sync-time="200" />
 </beans>
